@@ -39,7 +39,7 @@ def insert_to_db(df):
     database = db_config['database']    
     user = db_config['user']
     password = db_config['password']    
-    #table_name = db_config['table_name'] 
+    table_name = db_config['table_name'] 
  
     print(f"從環境變數讀取資料庫連線資訊: server={server}, database={database}, user={user}, password={'*' * len(password) if password else None}") 
 
@@ -60,15 +60,16 @@ def insert_to_db(df):
         cursor = connect.cursor()
         print("資料庫連線成功")
 
-
-        # 將 DataFrame 轉 list of tuples
+        # 假設 md5Key 是 PK
+        cursor.execute(f"SELECT uid FROM dbo.{table_name}")
+        existing = {row[0] for row in cursor.fetchall()}
+        df = df[~df['md5Key'].isin(existing)]
+        print(f"過濾後剩 {len(df)} 筆新資料需要寫入資料庫...")
+        #將 DataFrame 轉 list of tuples
         records = df[['md5Key', 'title', 'link', 'published']].values.tolist()
         records_tuples = [tuple(x) for x in records]
-
-        print(f"準備寫入 {len(records_tuples)} 筆資料到資料庫...")
-
-        # 寫入資料
-        
+        #print(f"準備寫入 {len(records_tuples)} 筆資料到資料庫...")
+        #寫入資料
         cursor.executemany(INS_SQL, records_tuples)
         connect.commit()
 

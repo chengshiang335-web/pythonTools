@@ -20,7 +20,7 @@ feed = feedparser.parse(rss_url)
 data = []
 #print(f"len:{len(feed.entries)}")
 
-for entry in feed.entries[:6]:  # 只處理前5筆資料，實際應用中可以移除切片以處理全部資料
+for entry in feed.entries:  # 只處理前5筆資料，實際應用中可以移除切片以處理全部資料
     
     pub_struct = entry.published_parsed if 'published_parsed' in entry else None
     # 轉換為 SQL 標準格式字串
@@ -34,6 +34,7 @@ for entry in feed.entries[:6]:  # 只處理前5筆資料，實際應用中可以
     })
 
 df = pd.DataFrame(data)
-print(df['published'])
+print(f"總共處理了 {len(df)} 筆資料")
+#print(df['published'])
 # 將整理好的 df 以及設定檔的參數，傳遞給專門處理寫入 SQL Server 的元件
 db_service.insert_to_db(df)
