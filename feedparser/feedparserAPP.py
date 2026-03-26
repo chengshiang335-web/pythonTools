@@ -20,10 +20,10 @@ feed = feedparser.parse(rss_url)
 data = []
 #print(f"len:{len(feed.entries)}")
 
-for entry in feed.entries:  # 只處理前5筆資料，實際應用中可以移除切片以處理全部資料
+for entry in feed.entries:
     
     pub_struct = entry.published_parsed if 'published_parsed' in entry else None
-    # 轉換為 SQL 標準格式字串
+   
     sql_published = datetime.datetime.strftime(datetime.datetime(*pub_struct[:6]), '%Y-%m-%d %H:%M:%S')
     
     data.append({
